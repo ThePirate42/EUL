@@ -14,7 +14,7 @@ namespace eul{
 	inline constexpr bool is_integral_v = std::is_integral_v<T>;
 	
 	template <typename T>
-	inline constexpr bool is_arithmetic_v = std::is_floating_point_v<T> || is_integral_v<T>;
+	inline constexpr bool is_arithmetic_v = std::is_arithmetic_v<T> || is_integral_v<T>;
 	
 	template <typename T>
 	concept integral = is_integral_v<T>;
