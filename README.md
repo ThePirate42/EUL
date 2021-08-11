@@ -1,5 +1,5 @@
 # EUL
-The mathEmatics Useful Library (the name is a work in progress) is a math general purpose c++20 header library that, among other things, features a big integer implementation. It was initially created for personal use while solving [Project Euler](https://projecteuler.net/) problems. That is kinda still my only reason of updating this for now, I uploaded it here just for fun. It's probably one of the least performant implementations of bigint out here, but feel free to use it if you want, at least it's very simple to "install" and use.
+The mathEmatics Useful Library (the name is a work in progress) is a math general purpose c++20 header library that, among other things, features a big integer implementation. It was initially created for personal use while solving [Project Euler](https://projecteuler.net/) problems. That is kinda still my only reason of updating this for now. It's probably one of the least performant implementations of bigint out here, but feel free to use it if you want, at least it's very simple to "install" and use.
 
 ## How to use
 
