@@ -8,6 +8,7 @@
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -20,15 +21,15 @@ namespace eul{
 	
 	class bigint {
 		
-		using size_type = std::uint_least64_t;
+		using size_type = std::uint64_t;
 		
-		static const std::uint_least64_t base=static_cast<std::uint_least64_t>(std::numeric_limits<std::uint32_t>::max())+1;
-		static const std::uint_least64_t digits10base=static_cast<std::uint_least64_t>(std::numeric_limits<std::uint32_t>::digits10)+1;
+		static const std::uint64_t base=static_cast<std::uint64_t>(std::numeric_limits<std::uint32_t>::max())+1;
+		static const std::uint64_t digits10base=static_cast<std::uint64_t>(std::numeric_limits<std::uint32_t>::digits10)+1;
 		
 		bool negative=false;
 		std::vector<std::uint32_t> container;
 		
-		std::uint_least64_t getDigit(size_type k) const{
+		std::uint64_t getDigit(size_type k) const{
 			if(k>=container.size()){
 				return 0;
 			}
@@ -161,7 +162,7 @@ namespace eul{
 		while(n.size()>bigint::digits10base || std::stoull(std::string(n,0,bigint::digits10base))>=bigint::base){
 			std::string quot;
 			bigint::size_type con=bigint::digits10base;
-			std::uint_least64_t partdivid=std::stoull(std::string(n,0,bigint::digits10base));
+			std::uint64_t partdivid=std::stoull(std::string(n,0,bigint::digits10base));
 			if(partdivid<bigint::base){
 				partdivid=partdivid*10+(n[con]-'0');
 				con++;
@@ -250,9 +251,9 @@ namespace eul{
 		if(digits<b.container.size()){
 			digits=b.container.size();
 		}
-		std::uint_least64_t rem=0;
+		std::uint64_t rem=0;
 		for(size_type k=0; k<digits; k++){
-			std::uint_least64_t sum=rem+getDigit(k)+b.getDigit(k);
+			std::uint64_t sum=rem+getDigit(k)+b.getDigit(k);
 			rem=sum/base;
 			sum%=base;
 			if(k<container.size()){
@@ -284,9 +285,9 @@ namespace eul{
 			return *this;
 		}
 		size_type digits=container.size();
-		std::uint_least64_t rem=0;
+		std::uint64_t rem=0;
 		for(size_type k=0; k<digits; k++){
-			std::uint_least64_t diff=base+getDigit(k)-b.getDigit(k)-rem;
+			std::uint64_t diff=base+getDigit(k)-b.getDigit(k)-rem;
 			rem=1;
 			if(diff>=base){
 				diff-=base;
@@ -311,9 +312,9 @@ namespace eul{
 		for(size_type k=0; k<b.container.size(); k++){
 			bigint part;
 			part.container=std::vector<std::uint32_t>(k,0);
-			std::uint_least64_t rem=0;
+			std::uint64_t rem=0;
 			for(size_type j=0; j<container.size() || rem!=0; j++){
-				std::uint_least64_t prod=(b.getDigit(k)*getDigit(j))+rem;
+				std::uint64_t prod=(b.getDigit(k)*getDigit(j))+rem;
 				rem=prod/base;
 				prod%=base;
 				part.container.push_back(prod);
@@ -345,17 +346,17 @@ namespace eul{
 			con++;
 		}
 		while(con<=container.size()){
-			std::uint_least64_t min=0;
-			std::uint_least64_t max=base-1;
+			std::uint64_t min=0;
+			std::uint64_t max=base-1;
 			while(max-min>1){
-				std::uint_least64_t mid=min+(max-min)/2;
+				std::uint64_t mid=min+(max-min)/2;
 				if(partdivid-b*mid<0){
 					max=mid-1;
 				} else {
 					min=mid;
 				}
 			}
-			std::uint_least64_t partquot;
+			std::uint64_t partquot;
 			if(partdivid-b*max<0){
 				partquot=min;
 			} else {
@@ -367,17 +368,17 @@ namespace eul{
 			partdivid.normalize();
 			con++;
 		}
-		std::uint_least64_t min=0;
-		std::uint_least64_t max=base-1;
+		std::uint64_t min=0;
+		std::uint64_t max=base-1;
 		while(max-min>1){
-			std::uint_least64_t mid=min+(max-min)/2;
+			std::uint64_t mid=min+(max-min)/2;
 			if(partdivid-b*mid<0){
 				max=mid-1;
 			} else {
 				min=mid;
 			}
 		}
-		std::uint_least64_t partquot;
+		std::uint64_t partquot;
 		if(partdivid-b*max<0){
 			partquot=min;
 		} else {
@@ -403,10 +404,21 @@ namespace eul{
 		}
 		bigint n=*this;
 		n.negative=false;
-		while(n>0){
-			bigint a=n/10;
-			str+=(n-a*10).container[0]+'0';
-			n=a;
+		while(n!=0){
+			constexpr std::uint64_t powten = ipow<std::uint64_t>(10,std::numeric_limits<std::uint64_t>::digits10);
+			bigint a = n/powten;
+			bigint chunk = n-a*powten;
+			n = a;
+			std::uint64_t intchunk = chunk.container[0];
+			if(chunk.container.size()>1){
+				std::memcpy(reinterpret_cast<std::byte*>(&intchunk)+sizeof(std::uint32_t),&chunk.container[1],sizeof(std::uint32_t));
+			}
+			std::string strchunk = std::to_string(intchunk);
+			std::reverse(strchunk.begin(),strchunk.end());
+			if(n!=0){
+				strchunk.append(std::numeric_limits<std::uint64_t>::digits10-strchunk.size(),'0');
+			}
+			str += strchunk;
 		}
 		if(negative){
 			str+='-';
