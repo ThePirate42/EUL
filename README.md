@@ -39,7 +39,7 @@ The `bigint` class has a template constructor that accepts all the integer types
 eul::bigint a = 747348;
 ```
 
-and an *explicit* template constructor that accepts floting_point types
+and an *explicit* template constructor that accepts floating point types
 
 ```
 eul::bigint(7.563);
