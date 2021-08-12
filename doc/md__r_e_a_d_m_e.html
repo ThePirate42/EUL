@@ -111,7 +111,7 @@ Bigint guide</h2>
 <div class="fragment"><div class="line">eul::bigint a = b;</div>
 </div><!-- fragment --><p>The <code>bigint</code> class has a template constructor that accepts all the integer types</p>
 <div class="fragment"><div class="line">eul::bigint a = 747348;</div>
-</div><!-- fragment --><p>and an <em>explicit</em> template constructor that accepts floting_point types</p>
+</div><!-- fragment --><p>and an <em>explicit</em> template constructor that accepts floating point types</p>
 <div class="fragment"><div class="line">eul::bigint(7.563);</div>
 </div><!-- fragment --><p>There is also <code>stobi</code>, a string to bigint function that works like <code>std::stoi</code> (but accepts only base 10 as input), and an explicit conversion function bigint to string (that also only has base 10 output). For now, there <b>isn't</b> a bigint to integer conversion function (I'll add it when I'll decide how to handle numbers that the builtin types can't handle).</p>
 <p>If you want to initialize a bigint with an integer literal, but with a number greater than what the builtin integer types can handle, you can use a custom literal: just append <code>_bi</code> to the literal in question, like this:</p>
