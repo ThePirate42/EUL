@@ -3,6 +3,8 @@ The mathEmatics Useful Library (the name is a work in progress) is a math genera
 
 ## How to use
 
+**WARNING**: due to a compiler bug, the library will not compile with gcc 11.1
+
 For starters, everything in the library is placed inside the `eul` namespace. There is one exception: the `bigint operator"" _bi (const char *n)` function, the function responsible for implementing bigint literals, is inside the inline `eul::literals` namespace; the reasons for this choice are explained in [this](https://web.archive.org/web/20210802172056/https://stackoverflow.com/questions/49054477/how-to-refer-to-user-defined-literal-operator-inside-a-namespace) StackOverflow page.
 
 The library uses three headers:
