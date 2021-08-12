@@ -25,8 +25,10 @@
 var NAVTREE =
 [
   [ "EUL", "index.html", [
-    [ "EUL", "md__d___programmazione__repositories__e_u_l__r_e_a_d_m_e.html", [
-      [ "How to use", "md__d___programmazione__repositories__e_u_l__r_e_a_d_m_e.html#autotoc_md1", null ]
+    [ "EUL", "md__r_e_a_d_m_e.html", [
+      [ "How to use", "md__r_e_a_d_m_e.html#autotoc_md1", [
+        [ "Bigint guide", "md__r_e_a_d_m_e.html#autotoc_md2", null ]
+      ] ]
     ] ],
     [ "Namespaces", "namespaces.html", [
       [ "Namespace List", "namespaces.html", "namespaces_dup" ],
