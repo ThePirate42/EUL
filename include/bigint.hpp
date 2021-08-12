@@ -137,7 +137,7 @@ namespace eul{
 	template<>
 	inline constexpr bool is_integral_v<bigint> = true;
 	
-	bigint stobi(const std::string &str){
+	inline bigint stobi(const std::string &str){
 		bigint res;
 		
 		std::string::const_iterator msd=std::find_if_not(str.begin(),str.end(),[](char d){return std::isspace(d);});
@@ -194,7 +194,7 @@ namespace eul{
 		
 	}
 		
-	std::strong_ordering operator<=>(const bigint &a,const bigint &b){
+	inline std::strong_ordering operator<=>(const bigint &a,const bigint &b){
 		if(a.negative!=b.negative){
 			return b.negative<=>a.negative;
 		}
@@ -235,7 +235,7 @@ namespace eul{
 		return a;
 	}
 	
-	bigint& bigint::operator+=(const bigint &b){
+	inline bigint& bigint::operator+=(const bigint &b){
 		if(this==&b){
 			*this*=2;
 			return *this;
@@ -268,7 +268,7 @@ namespace eul{
 		return *this;
 	}
 	
-	bigint& bigint::operator-=(const bigint &b){
+	inline bigint& bigint::operator-=(const bigint &b){
 		if(this==&b){
 			*this=0;
 			return *this;
@@ -299,7 +299,7 @@ namespace eul{
 		return *this;
 	}
 	
-	bigint& bigint::operator*=(const bigint &b){
+	inline bigint& bigint::operator*=(const bigint &b){
 		if(*this==0){
 			return *this;
 		}
@@ -327,7 +327,7 @@ namespace eul{
 		return *this;
 	}
 	
-	bigint& bigint::operator/=(const bigint &b){
+	inline bigint& bigint::operator/=(const bigint &b){
 		if(b==0){
 			throw std::domain_error("bigint: Division by zero");
 		}
@@ -391,12 +391,12 @@ namespace eul{
 		return *this;
 	}
 	
-	bigint& bigint::operator%=(const bigint &b){
+	inline bigint& bigint::operator%=(const bigint &b){
 		*this=*this-(*this/b)*b;
 		return *this;
 	}
 	
-	bigint::operator std::string() const{
+	inline bigint::operator std::string() const{
 		std::string str;
 		if(*this==0){
 			str+='0';
@@ -427,12 +427,12 @@ namespace eul{
 		return str;
 	}
 	
-	std::ostream& operator<<(std::ostream &os, const bigint &n){
+	inline std::ostream& operator<<(std::ostream &os, const bigint &n){
 		os << static_cast<std::string>(n);
 		return os;
 	}
 	
-	std::istream& operator>>(std::istream &is, bigint &n){
+	inline std::istream& operator>>(std::istream &is, bigint &n){
 		std::string str;
 		is >> str;
 		try{
@@ -443,7 +443,7 @@ namespace eul{
 		return is;
 	}
 	
-	std::size_t num10Digits(bigint n){
+	inline std::size_t num10Digits(bigint n){
 		static std::vector<bigint> lookuptable;
 		bigint::size_type maxmag=((32*n.container.size()*std::log(2))/(std::log(2)+std::log(5)))+1;
 		if(maxmag>lookuptable.size()){
