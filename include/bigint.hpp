@@ -2,6 +2,7 @@
 #define BIGINT
 
 #include <algorithm>
+#include <bit>
 #include <cctype>
 #include <cmath>
 #include <compare>
@@ -411,7 +412,11 @@ namespace eul{
 			n = a;
 			std::uint64_t intchunk = chunk.container[0];
 			if(chunk.container.size()>1){
-				std::memcpy(reinterpret_cast<std::byte*>(&intchunk)+sizeof(std::uint32_t),&chunk.container[1],sizeof(std::uint32_t));
+				if constexpr(std::endian::native == std::endian::little){
+					std::memcpy(reinterpret_cast<std::byte*>(&intchunk)+sizeof(std::uint32_t),&chunk.container[1],sizeof(std::uint32_t));
+				} else {
+					std::memcpy(&intchunk,&chunk.container[1],sizeof(std::uint32_t));
+				}
 			}
 			std::string strchunk = std::to_string(intchunk);
 			std::reverse(strchunk.begin(),strchunk.end());
