@@ -38,6 +38,9 @@ namespace eul{
 		
 	public:
 		
+		// Truth table builder
+		void computetruthtable() const;
+		
 		// Constructor
 		proposition(const std::string& expre){
 			expression=expre;
@@ -55,13 +58,12 @@ namespace eul{
 		// Getters
 		const std::string& getExpression() const {return expression;}
 		const std::vector<char>& getLeaves() const {return leaves;}
+		const bitvector& getTruthtable() const {computetruthtable(); return truthtable;}
 		
 		// Comparison operator
 		friend bool operator==(const proposition &a,const proposition &b) {return a.expression==b.expression;}
 		
 		// Other
-		void computetruthtable() const;
-		
 		static void clearcache(){
 			truthcache.clear();
 		}
@@ -94,11 +96,67 @@ namespace eul{
 	}
 	
 	inline void proposition::computetruthtable() const{
+		if(!truthtable.empty()){
+			return;
+		}
+		
 		std::unordered_set<proposition>::const_iterator cachecopy = truthcache.find(*this);
 		if(cachecopy!=truthcache.end()){
 			truthtable=(*cachecopy).truthtable;
 			return;
 		}
+		
+		if(expression[1]>='A' && expression[1]<='Z'){
+			truthtable={0,1};
+		} else if(expression[1]=='!'){
+			proposition nested(expression.substr(2,expression.size()-3));
+			nested.computetruthtable();
+			truthtable=nested.truthtable;
+			truthtable.flip();
+		} else {
+			std::size_t op=2;
+			for(std::size_t con=1; con>0; op++){
+				if(expression[op]=='('){
+					con++;
+				}
+				if(expression[op]==')'){
+					con--;
+				}
+			}
+			proposition nested1(expression.substr(1,op-1));
+			proposition nested2(expression.substr(op+1,expression.size()-op-2));
+			nested1.computetruthtable();
+			nested2.computetruthtable();
+			std::size_t sizeoftruthtable=ipow<std::size_t>(2,leaves.size());
+			truthtable.reserve(sizeoftruthtable);
+			switch(expression[op]){
+				case '|':
+					for(std::size_t con=0; con<sizeoftruthtable; con++){
+						truthtable.push_back(nested1.truthtable[truthmask(nested1.leaves,leaves,con)] || nested2.truthtable[truthmask(nested2.leaves,leaves,con)]);
+					}
+					break;
+				case '&':
+					for(std::size_t con=0; con<sizeoftruthtable; con++){
+						truthtable.push_back(nested1.truthtable[truthmask(nested1.leaves,leaves,con)] && nested2.truthtable[truthmask(nested2.leaves,leaves,con)]);
+					}
+					break;
+				case '>':
+					for(std::size_t con=0; con<sizeoftruthtable; con++){
+						truthtable.push_back(!(nested1.truthtable[truthmask(nested1.leaves,leaves,con)]) || nested2.truthtable[truthmask(nested2.leaves,leaves,con)]);
+					}
+					break;
+				case '=':
+					for(std::size_t con=0; con<sizeoftruthtable; con++){
+						truthtable.push_back((nested1.truthtable[truthmask(nested1.leaves,leaves,con)] && nested2.truthtable[truthmask(nested2.leaves,leaves,con)]) || (!(nested1.truthtable[truthmask(nested1.leaves,leaves,con)]) && !(nested2.truthtable[truthmask(nested2.leaves,leaves,con)])));
+					}
+					break;
+			}
+		}
+		
+		proposition copyforcache=*this;
+		copyforcache.leaves.clear();
+		copyforcache.leaves.shrink_to_fit();
+		truthcache.insert(copyforcache);
 	}
 	
 }
