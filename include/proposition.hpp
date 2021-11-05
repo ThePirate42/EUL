@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -38,9 +39,6 @@ namespace eul{
 		
 	public:
 		
-		// Truth table builder
-		void computetruthtable() const;
-		
 		// Constructor
 		proposition(const std::string& expre){
 			expression=expre;
@@ -55,10 +53,17 @@ namespace eul{
 			leaves.shrink_to_fit();
 		}
 		
+		// Truth table builder
+		void computetruthtable() const;
+		
 		// Getters
 		const std::string& getExpression() const {return expression;}
 		const std::vector<char>& getLeaves() const {return leaves;}
 		const bitvector& getTruthtable() const {computetruthtable(); return truthtable;}
+		
+		// Truth table evaluators
+		bool isTautology() const {computetruthtable(); return std::all_of(truthtable.begin(),truthtable.end(),[](bool i){return i;});}
+		bool isContradiction() const {computetruthtable(); return std::all_of(truthtable.begin(),truthtable.end(),[](bool i){return !i;});}
 		
 		// Comparison operator
 		friend bool operator==(const proposition &a,const proposition &b) {return a.expression==b.expression;}
@@ -147,7 +152,7 @@ namespace eul{
 					break;
 				case '=':
 					for(std::size_t con=0; con<sizeoftruthtable; con++){
-						truthtable.push_back((nested1.truthtable[truthmask(nested1.leaves,leaves,con)] && nested2.truthtable[truthmask(nested2.leaves,leaves,con)]) || (!(nested1.truthtable[truthmask(nested1.leaves,leaves,con)]) && !(nested2.truthtable[truthmask(nested2.leaves,leaves,con)])));
+						truthtable.push_back(nested1.truthtable[truthmask(nested1.leaves,leaves,con)] == nested2.truthtable[truthmask(nested2.leaves,leaves,con)]);
 					}
 					break;
 			}
