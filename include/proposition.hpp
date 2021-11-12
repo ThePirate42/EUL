@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <functional>
+#include <iterator>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -64,6 +65,8 @@ namespace eul{
 		// Truth table evaluators
 		bool isTautology() const {computetruthtable(); return std::all_of(truthtable.begin(),truthtable.end(),[](bool i){return i;});}
 		bool isContradiction() const {computetruthtable(); return std::all_of(truthtable.begin(),truthtable.end(),[](bool i){return !i;});}
+		friend bool logicalConsequence(const proposition &premise, const proposition &conclusion);
+		friend bool logicalEquivalence(const proposition &prop1, const proposition &prop2);
 		
 		// Comparison operator
 		friend bool operator==(const proposition &a,const proposition &b) {return a.expression==b.expression;}
@@ -84,6 +87,12 @@ inline std::size_t std::hash<eul::proposition>::operator()(const eul::propositio
 namespace eul{
 	
 	inline std::unordered_set<proposition> proposition::truthcache{};
+	
+	inline std::vector<char> leavesUnion(const std::vector<char> &leaves1, const std::vector<char> &leaves2){
+		std::vector<char> leavesunion;
+		std::set_union(leaves1.begin(), leaves1.end(), leaves2.begin(), leaves2.end(), std::back_inserter(leavesunion));
+		return leavesunion;
+	}
 	
 	inline std::size_t truthmask(const std::vector<char> &smallmask, const std::vector<char> &largemask, std::size_t largeindex){
 		std::size_t smallindex=0;
@@ -162,6 +171,32 @@ namespace eul{
 		copyforcache.leaves.clear();
 		copyforcache.leaves.shrink_to_fit();
 		truthcache.insert(copyforcache);
+	}
+	
+	inline bool logicalConsequence(const proposition &premise, const proposition &conclusion){
+		premise.computetruthtable();
+		conclusion.computetruthtable();
+		std::vector<char> leavesunion = leavesUnion(premise.leaves,conclusion.leaves);
+		std::size_t sizeofcommontruthtable = ipow<std::size_t>(2,leavesunion.size());
+		for(std::size_t con=0; con<sizeofcommontruthtable; con++){
+			if(premise.truthtable[truthmask(premise.leaves,leavesunion,con)] && !(conclusion.truthtable[truthmask(conclusion.leaves,leavesunion,con)])){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	inline bool logicalEquivalence(const proposition &prop1, const proposition &prop2){
+		prop1.computetruthtable();
+		prop2.computetruthtable();
+		std::vector<char> leavesunion = leavesUnion(prop1.leaves,prop2.leaves);
+		std::size_t sizeofcommontruthtable = ipow<std::size_t>(2,leavesunion.size());
+		for(std::size_t con=0; con<sizeofcommontruthtable; con++){
+			if(prop1.truthtable[truthmask(prop1.leaves,leavesunion,con)] != prop2.truthtable[truthmask(prop2.leaves,leavesunion,con)]){
+				return false;
+			}
+		}
+		return true;
 	}
 	
 }
