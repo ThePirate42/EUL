@@ -32,19 +32,30 @@ namespace eul{
 		return a;
 	}
 	
-	template <integral L,integral T,integral U>
-	constexpr auto ipow(const T &base,U exp){
-		if(base==0 && exp==0){
+	template <integral L, integral T, integral U>
+	constexpr L ipow(const T& base, U exp){
+		if(base == 0 && exp == 0){
 			throw std::domain_error("ipow: Base and exponent are 0");
 		}
-		if(exp<0){
+		if(exp < 0){
 			throw std::domain_error("ipow: Exponent is negative");
 		}
-		L res=1;
-		for(; exp>0; exp--){
-			res*=base;
+		if(exp == 0){
+			return 1;
 		}
-		return res;
+		L y = 1;
+		L x = base;
+		while(exp > 1){
+			if(!(exp % 2)){
+				x *= x;
+				exp /= 2;
+			} else {
+				y *= x;
+				x *= x;
+				exp = (exp - 1) / 2;
+			}
+		}
+		return x * y;
 	}
 	
 	template <class T,std::size_t N,class U>
